@@ -62,7 +62,8 @@ class XTerm:
             staticFolder = os.path.join(
                 os.path.dirname(__file__), "client/dist")
         except Exception as e:
-            manager.write_info_file(os.getpid(), False, str(e))
+            manager.write_info_file(os.getpid(),
+                                    False, str(e))
 
         try:
             app = tornado.web.Application([
