@@ -9,11 +9,18 @@ def _get_version():
         version = fh.read().strip()
         return version
 
+# Try to read README.md, but provide a fallback if it's not available
+try:
+    with open('README.md', 'r') as readme_file:
+        long_description = readme_file.read()
+except (IOError, FileNotFoundError):
+    long_description = "Open a terminal in Google Colab, including the free tier."
+
 setup(name='colab-xterm',
       version=_get_version(),
       description='Open a terminal in colab, including the free tier.',
       long_description_content_type="text/markdown",
-      long_description=open('README.md').read(),
+      long_description=long_description,
       url='https://github.com/InfuseAI/colab-xterm',
       project_urls={
           "Bug Tracker": "https://github.com/InfuseAI/colab-xterm/issues",

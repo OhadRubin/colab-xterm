@@ -78,11 +78,12 @@ def _xterm_magic(args_string):
     port = 10000
     command_args = []
 
-    # Parse parameters and command arguments
+    # Process arguments
     i = 0
     while i < len(parsed_args):
         arg = parsed_args[i]
         if '=' in arg and arg.split('=')[0] in ["height", "port"]:
+            # Handle key=value parameters
             kv_pair = arg.split('=')
             k = kv_pair[0]
             v = kv_pair[1]
@@ -91,11 +92,11 @@ def _xterm_magic(args_string):
                     height = int(v)
                 elif k == "port":
                     port = int(v)
+            i += 1
         else:
-            # Assume this and all remaining args are for the command
+            # All remaining arguments are for the command
             command_args = parsed_args[i:]
             break
-        i += 1
 
     while True:
         if not is_port_in_use(port):
