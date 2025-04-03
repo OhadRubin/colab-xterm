@@ -73,30 +73,44 @@ def _xterm_magic(args_string):
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
             return s.connect_ex(('localhost', port)) == 0
 
+    # Split args taking quotes into account
     parsed_args = shlex.split(args_string, comments=True, posix=True)
     height = 800
     port = 10000
     command_args = []
-
+    
+    # Track if we've found a parameter vs command argument
+    in_params = True
+    
     # Process arguments
     i = 0
     while i < len(parsed_args):
         arg = parsed_args[i]
-        if '=' in arg and arg.split('=')[0] in ["height", "port"]:
+        if in_params and '=' in arg:
             # Handle key=value parameters
-            kv_pair = arg.split('=')
-            k = kv_pair[0]
-            v = kv_pair[1]
-            if v.isdigit():
-                if k == "height":
-                    height = int(v)
-                elif k == "port":
-                    port = int(v)
-            i += 1
+            parts = arg.split('=', 1)  # Split on first equals sign only
+            k = parts[0].strip()
+            v = parts[1].strip()
+            
+            if k == "height" and v.isdigit():
+                height = int(v)
+            elif k == "port" and v.isdigit():
+                port = int(v)
+            else:
+                # Not a recognized parameter, treat this and all remaining as command
+                in_params = False
+                command_args = parsed_args[i:]
+                break
         else:
-            # All remaining arguments are for the command
+            # Not a parameter, all remaining args are for command
+            in_params = False
             command_args = parsed_args[i:]
             break
+        i += 1
+    
+    # Print the command being executed for debugging
+    if command_args:
+        print_or_update(f"Executing command: {' '.join(command_args)}")
 
     while True:
         if not is_port_in_use(port):
